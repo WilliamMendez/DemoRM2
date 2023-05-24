@@ -1,17 +1,18 @@
-import MeshFromFunction
+import MarchingCubesMesh as MeshFromFunction
 import numpy as np
 import matplotlib.pyplot as plt
 
-# function = 'x**2 + z**2 - y'
+function = 'x**2 + z**2 - y'
 # function = "np.sin(x) + np.cos(y) + np.exp(z)"
-function = "x**2 + y**2 + z**2 - 8"
+# function = "x**2 + y**2 + z**2 - 8"
 
-meshgenerator = MeshFromFunction.MarchingCubesMesh(function, -20, 20, 50)
+meshgenerator = MeshFromFunction.MarchingCubesMesh()
 
-vertices, triangles = meshgenerator.get_mesh()
+vertices, triangles = meshgenerator.getFromFunction(function, -200, 200, 10)
 # print(vertices)
 
-vertices = np.array(vertices)
+# los vertices están de la forma: [{"x": 0, "y": 0, "z": 0}, {"x": 0, "y": 0, "z": 0}, ...  }]
+vertices = np.array([[v["x"], v["y"], v["z"]] for v in vertices])
 
 # plot the vertices
 fig = plt.figure()
