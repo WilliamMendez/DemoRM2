@@ -16,12 +16,12 @@ class MarchingCubesMesh:
         self.resolution = resolution
 
         self.x = np.linspace(self.x_range[0], self.x_range[1], self.resolution)
-        print(self.x)
+        # print(self.x)
         self.y = np.linspace(self.y_range[0], self.y_range[1], self.resolution)
         self.z = np.linspace(self.z_range[0], self.z_range[1], self.resolution)
 
         self.xv, self.yv, self.zv = np.meshgrid(self.x, self.y, self.z, indexing='xy')
-        print(self.xv)
+        # print(self.xv)
 
         self.f = self.get_function(self.function)
 
@@ -34,35 +34,43 @@ class MarchingCubesMesh:
 
     def generate_mesh(self):
             space_between_vertices = 1 / (self.resolution - 1)
-            print(space_between_vertices)
+            # print(space_between_vertices)
             accuracy = space_between_vertices
 
             # Evaluate the scalar field
             values = self.f(self.xv, self.yv, self.zv)
+            print(values)
 
             # Generate the isosurface using the marching cubes algorithm
             verts, faces, _, _ = measure.marching_cubes(values)
 
+            verts *= np.array([np.diff(ar.flat)[0] for ar in [self.x, self.y, self.z]])
+            verts += np.array([ar.flat[0] for ar in [self.x, self.y, self.z]])
+
+
+            self.vertices = verts
+            self.triangles = faces
+
             # Scale and shift the vertices to the desired range
-            verts = verts * space_between_vertices
-            verts[:, 0] += self.x_range[0]
-            verts[:, 1] += self.y_range[0]
-            verts[:, 2] += self.z_range[0]
+            # verts = verts * space_between_vertices
+            # verts[:, 0] += self.x_range[0]
+            # verts[:, 1] += self.y_range[0]
+            # verts[:, 2] += self.z_range[0]
 
-            # Add the vertices and faces to the mesh data structure
-            self.vertices = [{"x": round(v[0],5), "y": round(v[1],5), "z": round(v[2],5)} for v in verts.tolist()]
-            # Convert the faces to a single array
-            triangleList = faces.tolist()
-            self.triangles = []
-            for i in range(len(triangleList)):
-                self.triangles.append(triangleList[i][0])
-                self.triangles.append(triangleList[i][1])
-                self.triangles.append(triangleList[i][2])
+            # # Add the vertices and faces to the mesh data structure
+            # self.vertices = [{"x": round(v[0],5), "y": round(v[1],5), "z": round(v[2],5)} for v in verts.tolist()]
+            # # Convert the faces to a single array
+            # triangleList = faces.tolist()
+            # self.triangles = []
+            # for i in range(len(triangleList)):
+            #     self.triangles.append(triangleList[i][0])
+            #     self.triangles.append(triangleList[i][1])
+            #     self.triangles.append(triangleList[i][2])
 
-                # add the triangles in reverse order
-                self.triangles.append(triangleList[i][2])
-                self.triangles.append(triangleList[i][1])
-                self.triangles.append(triangleList[i][0])
+            #     # add the triangles in reverse order
+            #     self.triangles.append(triangleList[i][2])
+            #     self.triangles.append(triangleList[i][1])
+            #     self.triangles.append(triangleList[i][0])
 
 
 
@@ -82,3 +90,4 @@ class MarchingCubesMesh:
         def f(x, y, z):
             return eval(functionstr)
         return f
+
